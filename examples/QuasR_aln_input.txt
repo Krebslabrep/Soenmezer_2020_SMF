@@ -1,0 +1,4 @@
+FileName1	FileName2	SampleName
+/g/krebs/sonmezer/HTS/SMF/MM/tmp/SMF_MM_SMF_MM_DE_AMP_SC2_P1-51636_forward_paired.fq.gz	/g/krebs/sonmezer/HTS/SMF/MM/tmp/SMF_MM_SMF_MM_DE_AMP_SC2_P1-51636_reverse_paired.fq.gz	SMF_MM_SMF_MM_DE_AMP_SC2_P1-51636
+/g/krebs/sonmezer/HTS/SMF/MM/tmp/SMF_MM_SMF_MM_DE_AMP_SC1_P3-51637_forward_paired.fq.gz	/g/krebs/sonmezer/HTS/SMF/MM/tmp/SMF_MM_SMF_MM_DE_AMP_SC1_P3-51637_reverse_paired.fq.gz	SMF_MM_SMF_MM_DE_AMP_SC1_P3-51637
+

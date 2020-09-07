@@ -3,19 +3,23 @@
 #script to call methylation average in GC and CG context
 #splits the call for individual chromosomes to avoid memory overload (only needed for large genomes)
 
-	
+## Define your working directory to be SMF github directory
+WD = "./github/Soenmezer_2020_SMF"
+setwd(WD)
+##Define output folder
+out_path=paste(WD,"/rds/",sep = "")
  
 	library(BSgenome)
 	library(BSgenome.Mmusculus.UCSC.mm10)
 	library(QuasR)
 
 
-	source('/g/krebs/krebs/Rscripts/Github/single_molecule_TF_call/functions/context_methylation_functions.r') 	
+	source('./single_molecule_TF_call/functions/context_methylation_functions.r') 	
 			
 	########
 	#Arguments
 	########
-	Qinput='/g/krebs/krebs/HTS/SMF/MM/QuasR_files_BAM/QuasR_input_SMF_MM_ES_NO_R1.txt' #QuasR alignement file containing a sample
+	Qinput='./examples/QuasR_input.txt' #QuasR alignement file containing a sample
 	cO=19 #minimal coverage
 	out.dir='/g/krebs/krebs/Rscripts/Github/methCall/tmp/' #output directory
 	nb.cores=20 #nb of cores to be used
@@ -33,15 +37,14 @@
             clObj=cluObj)
 	
 	NOMEaln=as.data.frame(alignments(NOMEproj)[[1]])
-
-
+	NOMEproj@aligner = "Rbowtie"
 
 #############################
 # Partition a genome by chromosome ("natural partitioning")
 #############################
 	musmus_length=seqlengths(Mmusculus) 														 # Length of all chromosome of MusMusculus
 	tiles <- tileGenome(musmus_length, tilewidth=max(musmus_length),cut.last.tile.in.chrom=TRUE) # Get a range of all chro (start,end ...1 to seqlengths(Mmusculus))
-                    
+	cO=19                  
 
 #############################
 # Call the methylation genome wide for all Cs, loop/chromosome
@@ -53,7 +56,7 @@
 		#call context methylation with coverage cutOff ( % of methylation)
 		#cO=19 																				# cutoff 20...20 depht min of each base...otherwise is NA
 		contextMet=call_context_methylation_v2(meth_gr ,cO,Mmusculus) 							# contextMet : list of 2 objects...CG and GC object..First part GRange, secoond part elementMetadata
-		saveRDS(contextMet,paste(out.dir,'Context_met_call',string.split(input_file,'input',2),'_',as.character(seqnames( tiles[1:21][i])),'_Co',as.character(cO),'.rds',sep=''))
+		saveRDS(contextMet,paste(out_path,'Context_met_call',string.split(input_file,'input',2),'_',as.character(seqnames( tiles[1:21][i])),'_Co',as.character(cO),'.rds',sep=''))
 		})
 
 
@@ -62,7 +65,7 @@
 #############################
 		
 	AllCf=mclapply(1:21,function(i){ 															# AllC final: list of all C of all chro...each chro an objetc
-		contextMet=readRDS(paste(out.dir,'Context_met_call',string.split(input_file,'input',2),'_',as.character(seqnames( tiles[1:21][i])),'_Co',as.character(cO),'.rds',sep=''))
+		contextMet=readRDS(paste(out_path,'Context_met_call',string.split(input_file,'input',2),'_',as.character(seqnames( tiles[1:21][i])),'_Co',as.character(cO),'.rds',sep=''))
 		CG=contextMet[[1]]																		# extract CG object
 		GC=contextMet[[2]] 																		# extract GC object	
 		AllC=c(CG,GC)																			# Bind CG and GC data
@@ -76,5 +79,5 @@
 	AllC=unlist(GRangesList(AllCf)) 															# Fusionne les donnees de tt les chro...qui etaient en objetc
 	AllC=sort(AllC)																				# Range par chro ( car AllC GRange)
 
-	saveRDS(AllC, paste(out.dir,'../Context_methylation_call',string.split(input_file,'input',2),'.rds',sep=''))
+	saveRDS(AllC, paste(out_path,'../Context_methylation_call',string.split(input_file,'input',2),'.rds',sep=''))
 

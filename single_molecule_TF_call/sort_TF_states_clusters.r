@@ -8,9 +8,17 @@
 #QuasR
 #BSGenome
 
+## Important: Define WD and set working directory to our github  directory
+## If working with different directories mmake sure your WD contains a subdirectory called rds
+WD = "./github/Soenmezer_2020_SMF"
+setwd(WD)
+##Define output folder
+out_path=paste(WD,"/rds/",sep = "")
 
-	#load single molecule functions
-	source('/g/krebs/krebs/Rscripts/Github/single_molecule_TF_call/functions/single_molecule_manipulation_functions.r') #load the ranges
+#load single molecule functions
+
+source('./single_molecule_TF_call/functions/single_molecule_manipulation_functions.r') #load the ranges
+
 
 	#####################
 	#example call
@@ -19,11 +27,19 @@
 	library("BSgenome.Mmusculus.UCSC.mm10")
 		
 	
-#use a set of reference genomic regions (i.e TF binding motifs mapped on the genome)
-	wmMapped_SOu=readRDS('/g/krebs/krebs/Rscripts/Github/single_molecule_TF_call/example_sets/jaspar2018_mm10_mapped_subset.rds')
+#use a set of reference genomic regions
+## Here we exemplify TF clusters 
+
+## Cluster Object 
+## This is a list of all TF clusters we perform co-occupancy analysis on
+
+wmMapped_SOu=readRDS('./single_molecule_TF_call/example_sets/mapped_jaspar_ChIP_bound_motifs.rds')
+
+
 	
-#load the reference alignment files created by QuasR
-	sampleSheet='/g/krebs/krebs/HTS/SMF/MM/QuasR_input_deduplicated.txt'
+
+	#load the reference alignment files created by QuasR
+	sampleSheet='./examples/QuasR_input.txt'
 	
 	NOMEproj=qAlign(sampleFile=sampleSheet, 
 			genome="BSgenome.Mmusculus.UCSC.mm10", 
@@ -50,7 +66,7 @@
 		
 	#find sites with pairs of TF bound within 150bp
 	#75b corespond to the size of the distance from TFBS center to largest collection bin
-		ov=as.matrix(findOverlaps(resize(wmMapped_SOu,1,fix='center'),resize(MotDBf_subsets,150,fix='center'),ignore.strand=T))
+		ov=as.matrix(findOverlaps(resize(wmMapped_SOu,1,fix='center'),resize(wmMapped_SOu,150,fix='center'),ignore.strand=T))
 	#assign distance between partners
 		pair_dist=start(resize(wmMapped_SOu[ov[,2],],1,fix='center'))-start(resize(wmMapped_SOu[ov[,1],],1,fix='center'))
 
@@ -64,17 +80,18 @@
 	#create a new object with all pairs summarised
 	#start from first motif center
 	#end from second motif center
+		
 		MotDB_pair=GRanges(
-			seqnames(wmMapped_SOu[ov2[,1]]),
-				IRanges(start(resize(wmMapped_SOu[ov2[,1]],1,fix='center')),start(resize(wmMapped_SOu[ov2[,2]],1,fix='center'))),
-				TF1=wmMapped_SOu[ov2[,1]]$name,
-				TF2=wmMapped_SOu[ov2[,2]]$name,
-				within_baits=wmMapped_SOu[ov2[,1]]$within_baits&wmMapped_SOu[ov2[,2]]$within_baits,
-				TF1_isBound=wmMapped_SOu[ov2[,1]]$isBound,
-				TF2_isBound=wmMapped_SOu[ov2[,2]]$isBound
-			)
-
-
+		  seqnames(wmMapped_SOu[ov2[,1]]),
+		  IRanges(start(resize(wmMapped_SOu[ov2[,1]],1,fix='center')),start(resize(wmMapped_SOu[ov2[,2]],1,fix='center'))),
+		  TF1=wmMapped_SOu[ov2[,1]]$name,
+		  TF2=wmMapped_SOu[ov2[,2]]$name,
+		  within_baits=ifelse(!(is.null(wmMapped_SOu$within_baits)), wmMapped_SOu[ov2[,1]]$within_baits&wmMapped_SOu[ov2[,2]]$within_baits, NA),
+		  TF1_isBound=ifelse(!(is.null(wmMapped_SOu$isBound)), wmMapped_SOu[ov2[,1]]$isBound, NA),
+		  TF2_isBound=ifelse(!(is.null(wmMapped_SOu$isBound)), wmMapped_SOu[ov2[,2]]$isBound, NA)
+		)
+		
+	
 	#reduce the object to create cluster
 		TF_cluster=reduce(MotDB_pair)
 		
@@ -208,6 +225,8 @@
 			TFcat=TFcat[TFcat<=10]
 
 		
+			
+			
 			countMats=lapply(sl(sampleNames),function(sp){
 							#load sorted reads
 							 sRs.u=readRDS(paste(out_path,'tmp_',sampleNames[sp],'_sorted_reads_TFmats_cluster.rds',sep=''))

@@ -1,0 +1,7 @@
+FileName	SampleName
+/g/krebs/krebs/HTS/SMF/MM/aln/SMF_MM_SMF_MM_AMP_TKO_DE_R1_Plate2_CS7-40259_forward_paired_afc075e0f926.bam	SMF_MM_SMF_MM_AMP_TKO_DE_R1_Plate2_CS7-40259
+/g/krebs/krebs/HTS/SMF/MM/aln/SMF_MM_SMF_MM_AMP_TKO_DE_R2_Plate2_CS7-40258_forward_paired_a567c379df1.bam	SMF_MM_SMF_MM_AMP_TKO_DE_R2_Plate2_CS7-40258
+/g/krebs/sonmezer/HTS/SMF/MM/aln/SMF_MM_CS5_TKO1_DE-38176_forward_paired_383b5cc11bee.bam	SMF_MM_AMP_TKO_DE_R1_CS6_38176
+/g/krebs/sonmezer/HTS/SMF/MM/aln/SMF_MM_CS6_TKO2_DE-38174_forward_paired_13bbe69cf6b46.bam	SMF_MM_AMP_TKO_DE_R2_CS6_38174
+
+

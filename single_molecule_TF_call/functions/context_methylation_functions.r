@@ -1,5 +1,11 @@
 
 
+#basic dependancies
+
+sl=function(x){seq(length(x))}
+string.split=function(string,sep,pos){unlist(lapply(string,function(x){lapply(strsplit(x,sep),'[',pos)}))}
+
+
 
 getCMethMatrix<-function(proj,range,samp){
 	Cs=qMeth(proj, query=range,mode="allC",reportLevel="alignment")
